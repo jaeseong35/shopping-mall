@@ -1,0 +1,124 @@
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.mino.mapper.AdminMapper">
+
+<!-- 상품 등록 -->
+<insert id="itemInsert">
+
+		<selectKey resultType="int" keyProperty="itemId" order="AFTER"> <!-- 아래 인설트 쿼리문 실행후 itemid값 반환  -->
+			
+			select last_insert_id()
+			<!-- 가장 최근에 실행된 id값 -->
+		</selectKey>
+
+		insert into shop_item(itemName, cateCode, itemPrice, itemStock, itemDiscount, itemIntro, itemContents)
+		values(#{itemName},#{cateCode}, #{itemPrice},#{itemStock},#{itemDiscount},#{itemIntro},#{itemContents})
+
+</insert>
+
+<!-- 카테고리 리스트  -->
+<select id="cateList" resultType="com.mino.domain.CateVO">
+
+	select * from item_cate order by catecode
+
+</select>
+
+<!-- 상품리스트 -->
+<select id="shopList" resultType="com.mino.domain.ItemVO">
+
+select  itemId, itemName,  b.cateName, itemStock, a.regDate
+		from shop_item a 
+		left outer join item_cate b on a.cateCode = b.cateCode
+		<if test="keyword != null">
+			where (itemName like concat ('%', #{keyword}, '%'))
+		</if>
+		order by itemId desc 
+		limit #{skip}, #{amount}	
+
+</select>
+
+<!-- 상품 총 갯수 -->
+<select id="shopTotal" resultType="int">
+
+	select count(*) from shop_item
+  		
+  		<if test="keyword != null">
+  		
+  			where itemName like concat('%' , #{keyword}, '%')
+  		
+  		</if>
+  		
+</select>
+
+<select id="shopView" resultType="com.mino.domain.ItemVO">
+
+select * from shop_item where itemId=#{itemId}
+
+</select>
+
+<update id="shopModify">
+
+UPDATE shop_item set itemName=#{itemName}, cateCode=#{cateCode}, itemPrice=#{itemPrice},itemStock=#{itemStock},itemDiscount=#{itemDiscount},
+itemIntro=#{itemIntro},itemContents=#{itemContents} where itemId = #{itemId}
+
+</update>
+
+<delete id="shopDelete">
+
+delete from shop_item where itemId=#{itemId}
+
+</delete>
+
+<insert id="imgInsert">
+
+insert into shop_image(itemId, fileName, uploadPath, uuid) values (#{itemId}, #{fileName}, #{uploadPath}, #{uuid});
+
+</insert>
+
+<!-- 지정 이미지 삭제 -->
+<delete id="deleteImageAll">
+
+delete from shop_image where itemId = #{itemId}
+
+</delete>
+
+<!-- 어제 날짜 이미지 리스트 -->
+<select id="checkFileList" resultType="com.mino.domain.ImageVO">
+
+select * from shop_image where uploadpath = DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -1 DAY), '%Y\%m\%d')
+
+</select>
+
+<select id="getImageInfo" resultType="com.mino.domain.ImageVO">
+
+select * from shop_image where itemId = #{itemId}
+
+</select>
+
+<!-- 주문 리스트 -->
+	<select id="getOrderList" resultType="com.mino.domain.OrderSuccessDTO">	
+			
+			select orderId, memberId, orderstate, orderdate
+		    from shop_order 
+		    <if test="keyword != null">
+		    	where memberId like concat('%',#{keyword}, '%')
+		    </if>
+		    order by orderdate desc
+		    limit #{skip}, #{amount}
+		    
+	</select>	
+	
+	<!-- 상품 총 개수 -->
+	<select id="getOrderTotal" resultType="int">
+	
+		select count(*) from shop_order
+		
+	    <if test="keyword != null">
+	    	where memberId like concat('%',#{keyword}, '%')
+	    </if>
+	
+	</select>
+
+
+  </mapper>
