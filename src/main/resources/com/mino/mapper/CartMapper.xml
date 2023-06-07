@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.mino.mapper.CartMapper">
+
+	<!-- 카트 추가 -->
+	<insert id="addCart">
+	
+		insert into shop_cart(memberId, itemId, itemCount)
+		values(#{memberId}, #{itemId}, #{itemCount}) 
+	
+	</insert>
+	
+	
+	<!-- 카트 삭제 -->
+	<delete id="deleteCart" >
+	
+		delete from shop_cart where cartId = #{cartId}
+	
+	</delete>
+	
+	<!-- 카트 수량 수정 -->
+	<update id="modifyCount">
+	
+		update shop_cart set itemCount = #{itemCount} where cartId = #{cartId}
+	
+	</update>
+	
+	
+	<!-- 카트 목록 -->
+	<select id="cartList" resultType="com.mino.domain.CartDTO">
+	
+		select a.cartId, a.memberId, a.itemId, a.itemCount, b.itemName, b.itemPrice, b.itemDiscount
+		from shop_cart a left outer join shop_item b on a.itemId = b.itemId
+		where memberId = #{memberId}	
+	
+	</select>
+	
+	<!-- 카트 확인 -->
+	<select id="checkCart" resultType="com.mino.domain.CartDTO">
+	
+		select * from shop_cart 
+		where memberId = #{memberId} and itemId = #{itemId}
+	
+	</select>
+	
+		<!-- 장바구니 제거 -->
+	<delete id="deleteOrderCart">
+	
+		delete from shop_cart where memberId = #{memberId} and itemId = #{itemId}
+	
+	</delete>
+	
+  </mapper>

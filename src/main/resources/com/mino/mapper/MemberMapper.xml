@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.mino.mapper.MemberMapper">
+  
+ <!-- 회원가입 -->
+<insert id="memberSign">
+  
+  insert into shop_member values(#{memberId}, #{memberPw}, #{memberName}, #{memberMail}, #{memberAddr1}, #{memberAddr2}, #{memberAddr3}, 0, now(), 10000, 1000)
+
+</insert>
+
+<!-- 아이디 중복체크 -->
+<select id="memberIdChk" resultType="int">
+
+select count(*) from shop_member where memberId = #{memberId};
+
+</select>
+
+<!-- 로그인 -->
+<select id="memberLogin" resultType="com.mino.domain.MemberVO">
+
+select memberId, memberPw, memberName,adminCk,money, point from shop_member where memberId=#{memberId}
+
+</select>
+
+	<!-- 주문자 정보 -->
+  	<select id="memberInfo" resultType="com.mino.domain.MemberVO">
+  	
+  		SELECT memberId, memberName, memberMail, memberAddr1, memberAddr2, memberAddr3, money, point 
+  		FROM shop_member 
+  		WHERE memberId = #{memberId}
+  	
+  	</select> 	
+
+  </mapper>
